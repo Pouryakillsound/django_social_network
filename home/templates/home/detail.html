@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    {% if request.user == post.user %}
+    <a class="btn btn-danger" href="{% url 'home:delete' post.id %}">Delete</a>
+    <a class="btn btn-info" href="{% url 'home:update' post.id %}">Update</a>
+    {% endif %}
+    {% if can_like %}
+        <a class="btn btn-primary col-sm-1" href="{% url 'home:like' post.id %}">Like {{ post.likes_count }}</a>
+    {% else %}
+        <a class="btn btn-danger col-sm-1" href="{% url 'home:unlike' post.id %}">Unlike {{ post.likes_count }}</a>
+    {% endif %}
+    <h6 class="text-center"><a href="{% url 'account:profile' post.user.id %}">{{ post.user }}</a></h6>
+    <p>{{ post.body }}</p>
+    <small>{{ post.created|date:"d/m/y" }}</small><hr>
+    {% if user.is_authenticated %}
+        <form class="col-sm-6" action="" method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="Send">
+    </form><br/>
+    {% else %}
+        <p class="alert alert-danger">Fist you gotta log in</p><br/>
+    {% endif %}
+    {% for comment in comments %}
+        {% with replies=comment.rcomments.all %}
+            <div class="card bg-dark text-white col-sm-5">
+                <p class="card-header">{{ comment.user.username }} | {{ comment.created|timesince }}</p>
+            {% if comment.user == request.user %}
+                <p><a class="btn btn-danger" href="{{ comment.get_absolute_url }}">Delete</a></p>
+            {% endif %}
+            <p><a class="btn btn-info m-2" href="{% url 'home:reply' post.id comment.id %}">reply</a></p>
+            <p class="card-body">{{ comment.body }}</p>
+                {% for reply in replies %}
+                {% if reply.user == request.user %}
+                    <div class="card bg-secondary text-white p-1 m-3  rounded-2">
+                        <p class="m-3 p-3 bg-dark"> {{ reply.user }} :  <a class="btn btn-danger" href="{{ reply.get_absolute_url }}">Delete</a><br>{{ reply.body }} <br> <small> {{ reply.created|timesince }} </small></p>
+                {% else %}
+                        <p class="m-3 p-3 bg-dark rounded-2">{{ reply.user }} : <br> <br> {{ reply.body }} <br> <small> {{ reply.created|timesince }} </small></p>
+                {% endif %}
+                {% endfor %}
+                    </div>
+        {% endwith %}
+            </div><br>
+        {% empty %}
+            <p>No comments yet!</p><br/>
+    {% endfor %}
+
+{% endblock %}
