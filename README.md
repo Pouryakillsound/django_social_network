@@ -2,7 +2,6 @@
 Just for beginning
 
 
-This is a very simple social networking website which its frontend is only and only made by Bootstrap
+This is a very simple social networking website which its frontend is only and only made by Bootstrap ...
 
-
-Clone it and run 'py manage.py runserver' after you create a venv... 
+create a venv then run 'python manage.py migrate' and then then 'python manage.py migrate'.
